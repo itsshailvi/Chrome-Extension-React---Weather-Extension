@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Weather Extension",
+    "description": "Chrome Weather Extension in React TypeScript",
+    "version": "1.0.0",
+    "icons": {
+        "16": "icons.png",
+        "48": "icons.png",
+        "128": "icons.png"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "React Extension",
+        "default_icon": "icons.png"
+    },
+    "options_page": "options.html",
+    "permissions": ["storage"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.js"]
+        }
+    ]
+    
+}
