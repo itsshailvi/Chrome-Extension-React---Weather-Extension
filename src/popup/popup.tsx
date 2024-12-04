@@ -43,16 +43,13 @@ const App = () => {
 
   //Messages
   const handleOverlayButtonClick = () => {
-    chrome.tabs.query(
-      {
-        active: true,
-      },
-      (tabs) => {
-        if (tabs.length > 0) {
-          chrome.tabs.sendMessage(tabs[0].id, Messages.TOGGLE_OVERLAY);
-        }
+    chrome.tabs.query({ active: true }, (tabs) => {
+      if (tabs.length > 0 && typeof tabs[0].id === "number") { // Check if tabs[0].id is a number
+        chrome.tabs.sendMessage(tabs[0].id, Messages.TOGGLE_OVERLAY);
+      } else {
+        console.error("Tab id is not available");
       }
-    );
+    });
   };
 
   //Deleting weather extension
@@ -64,13 +61,17 @@ const App = () => {
 
   //Change Temp from degree and farenheit
   const handleTempScaleButtonClick = () => {
-    const updateOptions: LocalStorageOptions = {
-      ...options,
-      tempScale: options.tempScale === "metric" ? "imperial" : "metric",
-    };
-    setStoredOptions(updateOptions).then(() => {
-      setOptions(updateOptions);
-    });
+    if (options) { // Ensure options is not null
+      const updateOptions: LocalStorageOptions = {
+        ...options,
+        tempScale: options.tempScale === "metric" ? "imperial" : "metric",
+        hasAutoOverlay: options.hasAutoOverlay ?? false, // Default to false if undefined
+        homeCity: options.homeCity ?? "", // Fallback to empty string if undefined
+      };
+      setStoredOptions(updateOptions).then(() => {
+        setOptions(updateOptions);
+      });
+    }
   };
 
   if (!options) {

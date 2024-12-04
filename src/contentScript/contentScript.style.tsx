@@ -2,7 +2,7 @@ const contentScriptStyles = () => {
 
     const styles = {
         itemContainer:{
-           position: 'fixed',
+           position: 'fixed' as 'fixed',
            left: '5%',
            top: '15%',
            maxWidth: '240px',

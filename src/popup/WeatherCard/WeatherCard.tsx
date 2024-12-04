@@ -26,6 +26,13 @@ interface cityContainerProps {
   onDelete?: () => void;
 }
 
+const initialWeatherData: OpenWeatherData = {
+  name: "",
+  main: { temp: 0, feels_like: 0, humidity: 0, pressure: 0, temp_max: 0, temp_min: 0 },
+  weather: [],
+  wind: { deg: 0, speed: 0 },
+};
+
 const WeatherCardContainer = ({ children, onDelete }: cityContainerProps) => {
   return (
     <Box mx={"4px"} my={"16px"}>
@@ -46,19 +53,18 @@ const WeatherCardContainer = ({ children, onDelete }: cityContainerProps) => {
 type WeatherCardState = "loading" | "error" | "ready";
 const WeatherCard = ({ city, onDelete, tempScale }: cityProps) => {
   const itemStyles = WeatherCardStyles();
-  const [weatherData, setWeatherData] = useState(null);
-  const [cardState, setCardState] = useState("loading");
+  const [weatherData, setWeatherData] = useState<OpenWeatherData>(initialWeatherData);
+  const [cardState, setCardState] = useState<WeatherCardState>("loading");
 
-  //Weather Details fetching from API from utils
+  // Weather Details fetching from API
   useEffect(() => {
-    fetchOpenWeatherData(city, tempScale)
+    const validCity = city || "New York"; // Provide a default city if undefined
+    fetchOpenWeatherData(validCity, tempScale)
       .then((data) => {
         setWeatherData(data);
         setCardState("ready");
-        console.log(data);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         setCardState("error");
       });
   }, [city, tempScale]);
@@ -83,17 +89,24 @@ const WeatherCard = ({ city, onDelete, tempScale }: cityProps) => {
             {weatherData.name}
           </Typography>
           <Typography style={itemStyles.itemContainerTemp}>
-            {weatherData.main.temp.toFixed()}
+            {weatherData.main.temp !== undefined
+              ? weatherData.main.temp.toFixed()
+              : "N/A"}
           </Typography>
           <Typography style={itemStyles.itemContainerBody}>
-            Feels like
-            {`  ${Math.round(weatherData.main.feels_like)}`}
+            Feels like{" "}
+            {weatherData.main.feels_like !== undefined
+              ? Math.round(weatherData.main.feels_like)
+              : "N/A"}
           </Typography>
         </Grid>
         <Grid item>
           {weatherData.weather.length > 0 && (
             <>
-              <img src={getWeatherIconSrc(weatherData.weather[0].icon)} />
+              <img
+                src={getWeatherIconSrc(weatherData.weather[0].icon)}
+                alt="Weather Icon"
+              />
               <Typography style={itemStyles.itemContainerBody}>
                 {weatherData.weather[0].main}
               </Typography>

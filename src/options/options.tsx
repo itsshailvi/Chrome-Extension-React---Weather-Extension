@@ -26,19 +26,36 @@ const App = () => {
 
   //Displaying option field data from storage on component did mount
   useEffect(() => {
-    getStoredOptions().then((options) => setOptions(options));
+    getStoredOptions().then((storedOptions) =>
+      setOptions({
+        homeCity: storedOptions?.homeCity || "",
+        hasAutoOverlay: storedOptions?.hasAutoOverlay ?? false,
+        tempScale: storedOptions?.tempScale,
+      })
+    );
   }, []);
-
+  
   //Customizing home city chnages 
   const handleHomeCityChange = (homeCity: string) => {
-    setOptions({
-      ...options,
+    setOptions((prev) => ({
+      ...prev!,
       homeCity,
-    });
+    }));
   };
 
-  //saving all the customized information
+  const handleAutoOverlayChange = (hasAutoOverlay: boolean) => {
+    setOptions((prev) => ({
+      ...prev!,
+      hasAutoOverlay,
+    }));
+  };
+
   const handleSaveButtonClick = () => {
+    if (!options) {
+      console.error("Options are null. Cannot save.");
+      return;
+    }
+  
     setFormState("saving");
     setStoredOptions(options).then(() =>
       setTimeout(() => {
@@ -46,14 +63,7 @@ const App = () => {
       }, 1000)
     );
   };
-
-  //Customizing overlay display of content page 
-  const handleAutoOverlayChange = (hasAutoOverlay: boolean) => {
-    setOptions({
-      ...options,
-      hasAutoOverlay,
-    });
-  };
+  
 
   const isFieldDisabled = formState === "saving";
 
@@ -79,7 +89,6 @@ const App = () => {
             </Grid>
             <Grid item>
               <Typography variant="body1">
-                {" "}
                 Auto toggle overlay on webpage load
               </Typography>
               <Switch
